@@ -33,28 +33,20 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Find Android project
+        run: |
+          PROJECT_DIR=$(find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) -print -quit | xargs dirname)
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Project found at: $PROJECT_DIR"
+
       - name: Build APK
-        working-directory: VoiceChangerAnime
-        run: gradle --no-daemon assembleDebug
+        run: |
+          cd "$PROJECT_DIR"
+          gradle --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: VoiceChanger-debug-apk
-          path: VoiceChangerAnime/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error        with:
-          gradle-version: '8.9'
-
-      -  name: Build APK
-  run: |
-    PROJECT_DIR=$(dirname "$(find . -name settings.gradle.kts -o -name settings.gradle | head -n 1)")
-    echo "Project directory: $PROJECT_DIR"
-    cd "$PROJECT_DIR"
-    gradle --no-daemon assembleDebug
-
-      - name: Upload APK
-  uses: actions/upload-artifact@v4
-  with:
-    name: VoiceChanger-debug-apk
-    path: "**/app/build/outputs/apk/debug/app-debug.apk"
-    if-no-files-found: error
+          path: "**/app/build/outputs/apk/debug/app-debug.apk"
+          if-no-files-found: error
